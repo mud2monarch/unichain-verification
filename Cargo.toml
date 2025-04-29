@@ -4,3 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+alloy-rpc-client = { version = "0.15.6", features = ["reqwest"] }
+alloy-rpc-types = "0.15.6"
+clap = { version = "4.5.37", features = ["derive"] }
+dotenv = "0.15.0"
+reqwest = "0.12.15"
+tokio = { version = "1.44.2", features = ["full"] }
+url = "2.5.4"

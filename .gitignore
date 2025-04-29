@@ -20,3 +20,5 @@ target/
 
 /target
 .DS_Store
+.env
+cursor_context.md
