@@ -23,3 +23,4 @@ target/
 .env
 cursor_context.md
 Cargo.lock
+output.txt
