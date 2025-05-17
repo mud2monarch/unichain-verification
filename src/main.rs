@@ -6,6 +6,7 @@ use std::env;
 use url::Url;
 use tracing::{info, warn, error};
 use tracing_subscriber;
+use serde_json;
 
 #[derive(Parser)]
 struct Args {
@@ -40,12 +41,19 @@ async fn main() {
 
     let untrusted_block_number: u64 = receipt.block_number.expect("Failed to get block number from transaction receipt.");
 
+    let request = client.request("eth_getBlockByNumber", (format!("0x{:x}", untrusted_block_number), true));
+    let raw_response: serde_json::Value = request.await.expect("Failed to get block by number during RPC call with error.");
     // apparently alloy needs us to pass `true` to get all transactions and calculate the transaction root
-    let request = client.request("eth_getBlockByNumber", (untrusted_block_number, true));
-    let untrusted_block: Block = request.await.expect("Failed to get block by number during RPC call with error.");
-    info!("Block object: {:?}", untrusted_block);
+    // let request = client.request("eth_getBlockByNumber", (format!("0x{:x}", untrusted_block_number), true));
+    // let untrusted_block: Block = request.await.expect("Failed to get block by number during RPC call with error.");
+    // info!("Block object: {:?}", untrusted_block);
+
+    // info!("Transaction root: {:?}", untrusted_block.header.inner.transactions_root);
 
     // TODO: calcualte the transaction root, I guess I can't get the root from the RPC call..
     // let untrusted_transaction_root: String = untrusted_block
+
+    // let request = client.request("eth_getBlockByNumber", (untrusted_block_number, true));
+    // let untrusted_block = request.await.unwrap();
 
 }
