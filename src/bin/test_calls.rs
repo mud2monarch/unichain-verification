@@ -1,8 +1,8 @@
 use alloy::{
-    eips::eip1898::BlockNumberOrTag,
-    primitives::{B256, aliases},
+    consensus::transaction, eips::eip1898::BlockNumberOrTag,
+    primitives::{aliases, B256, utils::keccak256},
     providers::{Provider, ProviderBuilder},
-    rpc::types::{Block, TransactionReceipt},
+    rpc::types::{Block, TransactionReceipt}
 };
 use clap::Parser;
 use dotenv::dotenv;
@@ -12,6 +12,8 @@ use std::{env, str::FromStr};
 use tracing::{error, info, warn};
 use tracing_subscriber;
 use url::Url;
+use alloy_rlp::encode;
+use hex;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -34,40 +36,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let transaction_hash: B256 =
         B256::from_str("0x1ae319ba1a236dffe07bcaa323948c9268225f4050ab7eaf86ab5930a937f162")
             .unwrap();
-    let untrusted_transaction_receipt = op_provider
+    let untrusted_alloy_transaction = op_provider
         .get_transaction_by_hash(transaction_hash)
         .await
-        .expect("Failed to get transaction receipt.");
-    info!(
-        "untrusted tx receipt is {:?}",
-        untrusted_transaction_receipt
-    );
+        .expect("Failed to get transaction receipt in RPC call.")
+        .expect(&format!("Transaction receipt is None for transaction hash {}. Can't continue without a valid transaction.", transaction_hash));
 
-    // let untrusted_block_number: BlockNumberOrTag = BlockNumberOrTag::Number(15828242); // Unichain block number
+    info!("untrusted tx is {:?}", untrusted_alloy_transaction);
 
-    // let untrusted_block = op_provider
-    //     .get_block_by_number(untrusted_block_number)
-    //     .full()
-    //     .await
-    //     .expect("Failed to get block by number during RPC call with error.");
+    // TODO: This code is giving a hash mismatch :(
+    // let (untrusted_transaction, _) = untrusted_alloy_transaction.inner.inner.into_parts();
 
-    // info!("untrusted block is {:?}", untrusted_block);
+    // info!("tx is {:?}", untrusted_transaction);
+
+    // let untrusted_raw_rlp_bytes = encode(&untrusted_transaction);
+    // info!("untrusted rlp is {:?}", untrusted_raw_rlp_bytes);
+    // info!("hex-printed rlp is 0x{}", hex::encode(untrusted_raw_rlp_bytes.clone())); 
+
+    // let untrusted_hash = keccak256(untrusted_raw_rlp_bytes.clone());
+    // info!("untrusted hash is 0x{:x}", untrusted_hash);
+
+    //     // 1. Allocate a new buffer and prepend the type byte
+    // let mut tx_bytes = Vec::with_capacity(1 + untrusted_raw_rlp_bytes.len());
+    // tx_bytes.push(0x02);                                // type-byte for EIP-1559
+    // tx_bytes.extend_from_slice(&untrusted_raw_rlp_bytes);
+
+    // // 2. Hash it
+    // let derived = keccak256(&tx_bytes);
+    // info!("derived hash = 0x{:x}", derived);
+
+    // // 3. (optional) compare with RPC / wallet hash
+    // assert_eq!(derived, transaction_hash, "hash mismatch!");
 
     Ok(())
-    // let untrusted_block: Block = request.await.expect("Failed to get block by number during RPC call with error.");
-    // let raw_response: serde_json::Value = request.await.expect("Failed to get block by number during RPC call with error.");
-
-    // info!("Raw response: {:?}", raw_response);
-    // apparently alloy needs us to pass `true` to get all transactions and calculate the transaction root
-    // let request = client.request("eth_getBlockByNumber", (format!("0x{:x}", untrusted_block_number), true));
-
-    // info!("Block object: {:?}", untrusted_block);
-
-    // info!("Transaction root: {:?}", untrusted_block.header.inner.transactions_root);
-
-    // TODO: calcualte the transaction root, I guess I can't get the root from the RPC call..
-    // let untrusted_transaction_root: String = untrusted_block
-
-    // let request = client.request("eth_getBlockByNumber", (untrusted_block_number, true));
-    // let untrusted_block = request.await.unwrap();
 }
