@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-alloy-rpc-client = { version = "0.15.6", features = ["reqwest"] }
-alloy-rpc-types = "0.15.6"
+alloy = { version = "1.0.3", features = ["providers"] }
+op-alloy-network = "0.16.0"
 clap = { version = "4.5.37", features = ["derive"] }
 dotenv = "0.15.0"
 hex = "0.4.3"
