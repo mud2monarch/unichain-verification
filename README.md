@@ -6,3 +6,5 @@ This is not true. It's possible to take a transaction hash, which is generated b
 This repo is a program, later a website, that takes a trusted transaction hash and demonstrates each of these steps.
 
 This is, in many ways, a more verbose re-implementation of Noah Citron's [helios](https://github.com/a16z/helios) light client.
+
+More info in ProjectPlan.md.
